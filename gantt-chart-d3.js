@@ -6,12 +6,12 @@
 d3.gantt = function() {
     var FIT_TIME_DOMAIN_MODE = "fit";
     var FIXED_TIME_DOMAIN_MODE = "fixed";
-    
+
     var margin = {
-	top : 20,
-	right : 40,
-	bottom : 20,
-	left : 150
+	    top : 20,
+	    right : 40,
+	    bottom : 20,
+	    left : 150
     };
 
     var selector = 'body';
@@ -26,7 +26,7 @@ d3.gantt = function() {
     var tickFormat = "%H:%M";
 
     var keyFunction = function(d) {
-	      return d.startDate + d.taskName + d.endDate;
+	      return d.identifier;
     };
 
     var rectTransform = function(d) {
@@ -93,62 +93,67 @@ d3.gantt = function() {
 	 .attr("class", function(d){ 
 	     if(taskStatus[d.status] == null){ return "bar";}
 	     return taskStatus[d.status];
-	     }) 
+	  })
 	 .attr("y", 0)
 	 .attr("transform", rectTransform)
 	 .attr("height", function(d) { return y.rangeBand(); })
 	 .attr("width", function(d) { 
 	     return Math.max(1,(x(d.endDate) - x(d.startDate))); 
-	     });
-	 
-	 
+	 });
+
 	 svg.append("g")
 	 .attr("class", "x axis")
 	 .attr("transform", "translate(0, " + (height - margin.top - margin.bottom) + ")")
 	 .transition()
 	 .call(xAxis);
-	 
-	 svg.append("g").attr("class", "y axis").transition().call(yAxis);
-	 
-	 return gantt;
+
+	  svg.append("g").attr("class", "y axis").transition().call(yAxis);
+	  return gantt;
   };
-    
+
 
     gantt.redraw = function(tasks) {
 	    initTimeDomain(tasks);
       initAxis();
-	
 
-        var svg = d3.select(".chart");
+       var svg = d3.select(".chart");
+       var ganttChartGroup = svg.select(".gantt-chart");
+       var rect = ganttChartGroup.selectAll("rect").data(tasks, keyFunction);
 
-        var ganttChartGroup = svg.select(".gantt-chart");
-        var rect = ganttChartGroup.selectAll("rect").data(tasks, keyFunction);
-        
-        rect.enter()
+       // On data creation
+       rect.enter()
          .insert("rect",":first-child")
          .attr("rx", 5)
          .attr("ry", 5)
-	       .attr("class", function(d){ 
+	       .attr("class", function(d){
 	          if(taskStatus[d.status] == null){ return "bar";}
 	          return taskStatus[d.status];
-	        }) 
+	        })
 	        .transition()
 	        .attr("y", 0)
 	        .attr("transform", rectTransform)
 	        .attr("height", function(d) { return y.rangeBand(); })
-	        .attr("width", function(d) { 
-	          return Math.max(1,(x(d.endDate) - x(d.startDate))); 
+	        .attr("width", function(d) {
+	          return Math.max(1,(x(d.endDate) - x(d.startDate)));
 	        });
 
         rect.transition()
           .attr("transform", rectTransform)
 	        .attr("height", function(d) { return y.rangeBand(); })
-	        .attr("width", function(d) { 
-	          return Math.max(1,(x(d.endDate) - x(d.startDate))); 
+	        .attr("width", function(d) {
+	          return Math.max(1,(x(d.endDate) - x(d.startDate)));
 	        });
-        
+
+        // On data update
+        rect
+	        .attr("class", function(d){
+	          if(taskStatus[d.status] == null){ return "bar";}
+	          return taskStatus[d.status];
+	        });
+
+	    // On data deletion
 	    rect.exit().remove();
-	   
+
 	    svg.select(".x").transition().call(xAxis);
 	    svg.select(".y").transition().call(yAxis);
 
@@ -164,17 +169,17 @@ d3.gantt = function() {
     };
 
     gantt.margin = function(value) {
-	if (!arguments.length)
-	    return margin;
-	margin = value;
-	return gantt;
+	    if (!arguments.length)
+	      return margin;
+	    margin = value;
+	    return gantt;
     };
 
     gantt.timeDomain = function(value) {
-  if (!arguments.length)
-	    return [ timeDomainStart, timeDomainEnd ];
-	timeDomainStart = +value[0], timeDomainEnd = +value[1];
-	return gantt;
+      if (!arguments.length)
+	      return [ timeDomainStart, timeDomainEnd ];
+	    timeDomainStart = +value[0], timeDomainEnd = +value[1];
+	    return gantt;
     };
 
     /**
@@ -191,31 +196,31 @@ d3.gantt = function() {
     };
 
     gantt.taskTypes = function(value) {
-	if (!arguments.length)
-	    return taskTypes;
-	taskTypes = value;
-	return gantt;
+	    if (!arguments.length)
+	      return taskTypes;
+	    taskTypes = value;
+	    return gantt;
     };
-    
+
     gantt.taskStatus = function(value) {
-	if (!arguments.length)
-	    return taskStatus;
-	taskStatus = value;
-	return gantt;
+	    if (!arguments.length)
+	      return taskStatus;
+	    taskStatus = value;
+	    return gantt;
     };
 
     gantt.width = function(value) {
-	if (!arguments.length)
-	    return width;
-	width = +value;
-	return gantt;
+	    if (!arguments.length)
+	      return width;
+	    width = +value;
+	    return gantt;
     };
 
     gantt.height = function(value) {
-	if (!arguments.length)
-	    return height;
-	height = +value;
-	return gantt;
+	    if (!arguments.length)
+	      return height;
+	    height = +value;
+	    return gantt;
     };
 
     gantt.tickFormat = function(value) {
