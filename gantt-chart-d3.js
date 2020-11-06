@@ -91,7 +91,7 @@ d3.gantt = function() {
 	 .attr("rx", 5)
          .attr("ry", 5)
 	 .attr("class", function(d){ 
-	     if(taskStatus[d.status] == null){ return "bar";}
+	     if(taskStatus[d.status] == null){ return "bar bar-"+d.status;}
 	     return taskStatus[d.status];
 	  })
 	 .attr("y", 0)
@@ -126,7 +126,7 @@ d3.gantt = function() {
          .attr("rx", 5)
          .attr("ry", 5)
 	       .attr("class", function(d){
-	          if(taskStatus[d.status] == null){ return "bar";}
+	          if(taskStatus[d.status] == null){ return "bar bar-"+d.status;}
 	          return taskStatus[d.status];
 	        })
 	        .transition()
@@ -147,7 +147,7 @@ d3.gantt = function() {
         // On data update
         rect
 	        .attr("class", function(d){
-	          if(taskStatus[d.status] == null){ return "bar";}
+	          if(taskStatus[d.status] == null){ return "bar bar-"+d.status;}
 	          return taskStatus[d.status];
 	        });
 
