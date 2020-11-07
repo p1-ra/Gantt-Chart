@@ -44,21 +44,26 @@ d3.gantt = function() {
     var yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
 
     var initTimeDomain = function(tasks) {
-	if (timeDomainMode === FIT_TIME_DOMAIN_MODE) {
-	    if (tasks === undefined || tasks.length < 1) {
-		timeDomainStart = d3.time.day.offset(new Date(), -3);
-		timeDomainEnd = d3.time.hour.offset(new Date(), +3);
-		return;
+	    if (timeDomainMode === FIT_TIME_DOMAIN_MODE) {
+        timeDomainStart = new Date(999999999999999);
+        timeDomainEnd = new Date(0);
+
+	      if (tasks === undefined || tasks.length < 1) {
+		      timeDomainStart = d3.time.day.offset(new Date(), -3);
+		      timeDomainEnd = d3.time.hour.offset(new Date(), +3);
+		      return;
+        }
+        
+        tasks.forEach(t => {
+          if (t.endDate && t.endDate.getTime() > timeDomainEnd.getTime()) {
+            timeDomainEnd = t.endDate;
+          }
+
+          if (t.startDate && t.startDate.getTime() < timeDomainStart.getTime()) {
+            timeDomainStart = t.startDate;
+          }
+        });
 	    }
-	    tasks.sort(function(a, b) {
-		return a.endDate - b.endDate;
-	    });
-	    timeDomainEnd = tasks[tasks.length - 1].endDate;
-	    tasks.sort(function(a, b) {
-		return a.startDate - b.startDate;
-	    });
-	    timeDomainStart = tasks[0].startDate;
-	}
     };
 
     var initAxis = function() {
@@ -118,24 +123,24 @@ d3.gantt = function() {
 
        var svg = d3.select(".chart");
        var ganttChartGroup = svg.select(".gantt-chart");
-       var rect = ganttChartGroup.selectAll("rect").data(tasks, keyFunction);
+       var rect = ganttChartGroup.selectAll("rect").data(tasks, keyFunction).order();
 
        // On data creation
        rect.enter()
-         .insert("rect",":first-child")
-         .attr("rx", 5)
-         .attr("ry", 5)
-	       .attr("class", function(d){
-	          if(taskStatus[d.status] == null){ return "bar bar-"+d.status;}
-	          return taskStatus[d.status];
-	        })
-	        .transition()
-	        .attr("y", 0)
-	        .attr("transform", rectTransform)
-	        .attr("height", function(d) { return y.rangeBand(); })
-	        .attr("width", function(d) {
-	          return Math.max(1,(x(d.endDate) - x(d.startDate)));
-	        });
+        .insert("rect",":first-child")
+        .attr("rx", 5)
+        .attr("ry", 5)
+	      .attr("class", function(d){
+	        if(taskStatus[d.status] == null){ return "bar bar-"+d.status;}
+	        return taskStatus[d.status];
+	      })
+	      .transition()
+	      .attr("y", 0)
+	      .attr("transform", rectTransform)
+	      .attr("height", function(d) { return y.rangeBand(); })
+        .attr("width", function(d) {
+	        return Math.max(1,(x(d.endDate) - x(d.startDate)));
+	      });
 
         rect.transition()
           .attr("transform", rectTransform)
